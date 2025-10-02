@@ -13,6 +13,33 @@ use Illuminate\Support\Facades\DB;
 class DiaryEntryController extends Controller
 {
     /**
+     * Display diary entries that mention "happy" while tagged as Sad.
+     */
+    public function conflicts()
+    {
+        $userId = Auth::id();
+        $sadId = DB::table('emotions')->where('name', 'Sad')->value('id') ?? 2;
+
+        $entries = DB::table('diary_entries as de')
+            ->join('diary_entry_emotions as dee', 'de.id', '=', 'dee.diary_entries_id')
+            ->join('emotions as e', 'dee.emotion_id', '=', 'e.id')
+            ->select([
+                'de.id',
+                'de.date',
+                'de.content',
+                'e.name as emotion_name',
+                'dee.intensity',
+            ])
+            ->where('de.user_id', $userId)
+            ->where('dee.emotion_id', 2) // Sad emotion
+            ->whereRaw('LOWER(de.content) REGEXP ?', ['(^|[^a-z])happy([^a-z]|$)'])
+            ->orderByDesc('de.date')
+            ->get();
+
+        return view('diary.conflicts', compact('entries'));
+    }
+
+    /**
      * Display a listing of the resource.
      */
     public function index()

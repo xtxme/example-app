@@ -25,6 +25,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile/bio', [UserController::class, 'showBio'])->name('profile.show-bio');
     // Route to handle updating the bio
     Route::patch('/profile/bio', [UserController::class, 'updateBio'])->name('profile.update-bio');
+    Route::get('/diary/conflicts', [DiaryEntryController::class, 'conflicts'])->name('diary.conflicts');
     Route::resource('diary', DiaryEntryController::class); //add this line
     Route::resource('reminders', RemindersController::class);
 });
